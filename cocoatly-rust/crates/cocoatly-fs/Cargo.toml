@@ -1,0 +1,11 @@
+[package]
+name = "cocoatly-fs"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+cocoatly-core = { path = "../cocoatly-core" }
+walkdir.workspace = true
+anyhow.workspace = true

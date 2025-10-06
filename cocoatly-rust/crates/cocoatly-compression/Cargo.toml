@@ -1,0 +1,13 @@
+[package]
+name = "cocoatly-compression"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+cocoatly-core = { path = "../cocoatly-core" }
+flate2.workspace = true
+tar.workspace = true
+anyhow.workspace = true
+walkdir.workspace = true

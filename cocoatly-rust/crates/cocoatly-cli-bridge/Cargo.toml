@@ -1,0 +1,34 @@
+[package]
+name = "cocoatly-cli-bridge"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "cocoatly-install"
+path = "src/bin/install.rs"
+
+[[bin]]
+name = "cocoatly-uninstall"
+path = "src/bin/uninstall.rs"
+
+[[bin]]
+name = "cocoatly-verify"
+path = "src/bin/verify.rs"
+
+[[bin]]
+name = "cocoatly-state"
+path = "src/bin/state.rs"
+
+[dependencies]
+cocoatly-core = { path = "../cocoatly-core" }
+cocoatly-installer = { path = "../cocoatly-installer" }
+cocoatly-crypto = { path = "../cocoatly-crypto" }
+tokio.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true

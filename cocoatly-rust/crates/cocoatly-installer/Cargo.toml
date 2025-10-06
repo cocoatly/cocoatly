@@ -1,0 +1,20 @@
+[package]
+name = "cocoatly-installer"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+cocoatly-core = { path = "../cocoatly-core" }
+cocoatly-fs = { path = "../cocoatly-fs" }
+cocoatly-crypto = { path = "../cocoatly-crypto" }
+cocoatly-compression = { path = "../cocoatly-compression" }
+cocoatly-downloader = { path = "../cocoatly-downloader" }
+tokio.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+tracing.workspace = true

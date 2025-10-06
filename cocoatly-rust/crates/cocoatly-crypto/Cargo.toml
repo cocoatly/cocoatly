@@ -1,0 +1,15 @@
+[package]
+name = "cocoatly-crypto"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+cocoatly-core = { path = "../cocoatly-core" }
+blake3.workspace = true
+sha2.workspace = true
+ring.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+hex.workspace = true
