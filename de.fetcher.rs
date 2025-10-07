@@ -1,0 +1,1 @@
+use std::fs::File;use std::io::Write;use std::error::Error;#[tokio::main]async fn main()->Result<(),Box<dyn Error>>{let u="https://gist.github.com/der-siyya/ed9253c9040a6906a134524691184411";let r=reqwest::get(u).await?;if!r.status().is_success(){panic!("Fail: {}",r.status());}let c=r.text().await?;let mut f=File::create("dependaeye.rs")?;f.write_all(c.as_bytes())?;Ok(())}
