@@ -1,0 +1,21 @@
+# --- Set Cocoatly base directory ---
+export COCOATLY_HOME="$HOME/.cocoatly"
+
+# --- Add Cocoatly binary to PATH ---
+export PATH="$COCOATLY_HOME/bin:$PATH"
+
+# --- Aliases for common commands ---
+alias coco='cocoatly'
+alias coco-install='cocoatly install'
+alias coco-update='cocoatly verify'
+alias coco-remove='cocoatly uninstall'
+alias coco-list='cocoatly state'
+
+if command -v cocoatly >/dev/null 2>&1; then
+    COCOATLY_VERSION=$(cocoatly --version)
+    export PS1="(Cocoatly $COCOATLY_VERSION) $PS1"
+fi
+
+if [ -f "$COCOATLY_HOME/.cocoatly-extra.rc" ]; then
+    source "$COCOATLY_HOME/.cocoatly-extra.rc"
+fi
