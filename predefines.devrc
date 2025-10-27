@@ -1,0 +1,72 @@
+[DEPENDS]
+.devrc -out "/bin"
+.devrc -pop "/*DEPENDA+EYE"
+out .rc default
+
+[BINARIES]
+.devrc default binaries is null
+
+[WINDOWSRESOURCE]
+rc_clap=.devrc is .rc -c -out "./windowsresourcefiles/compiled/bin/*"
+if (rc_clap) is false -crfolder -out "./windowsresourcefiles/compiled/bin/*"
+if (rc_clap) is true in "./" -pop -out "./windowsresourcefiles/compiled/bin/*"
+
+[DEBUGGER]
+runfile=file in -out -locate ""filename".exe" filename is STR "terminal" -r debug 
+-mode .devrc -sec -out
+
+[CMDHANDLER]
+cmd_clap= -cmdbin -out STR in file ""filename".exe" in ""filename".exe" -locate STR "terminal" -o "CMD" -o "PowerShell"
+for (cmd_clap) -out -pop -c STR is filename,in cmd_clap -commitline -runfile 
+
+[FILER]
+file_ext=""filename"."STR"" -out STR 
+filename=""STR"."file_ext"" -out STR
+file=filename+file_ext
+file -out "-file" -cmdbin is cmd_clap 
+
+@DEVRC.IMPORT.dependency="./dependency.devrc"
+cmd_clap="./dependency.devrc"
+@DEVRC.IMPORT.cmd_clap
+rc_clap="./dependency.devrc"
+@DEVRC.IMPORT.rc_clap
+get="./dependency.devrc"
+@DEVRC.IMPORT.get
+
+@[TABLES]
+[TABLE]
+content="" is STR
+table=[content] -out STR -o numerics
+-force content else return (STR, numerics) -o -a content is default
+
+@[NUMERACY]
+[NUMERICS]
+numerics=[1, 2, 3, 4, 5, 6, 7, 8, 9, 0] with table[content] -a default -a STR -o numerics
+
+@[PIXELBITS]
+[BITS]
+bits= in numerics get table[content] in numerics
+#/bin/
+-mode SCRIPT
+function load(
+  ms=table[content] with numerics in -force -a ""table[content]"" -timed
+  in ms do table[content] with load -out -pop
+  for (bits) in ms -timed load bits -o else try (table[content] + -timed bits with ms -mode -a in table[STR content] is numerics ++1)
+) 
+
+@[LOADIMAGES]
+[IMAGES]
+images=for (bits) in ms do -timed load table[content]
+
+
+@[RESX]
+[RESOURCESX]
+resx=""filename"."file_ext"" file_ext is STR -locate ".resx" in file_ext else (
+ images[bits, table[content]]+""file_ext"" -to -c -ext .resx with table[content] in bits -timed with ms
+)
+
+[COCO.HOWTO.COMPILE]
+in -pop "./" dirlist "./windowsresourcefiles/compiled/bin/*" 
+for (rc_clap) in .devrc is .rc -c in .devrc -to -c .rc -file -cmdbin get file in STR filename, file_ext -runfile in STR "terminal" -to -r debug -cmdline -commitline .rc -to -c -to .devrc in .rc -cmdbin -r debug STR in "terminal" -rline "dotnet *" -rline "list" if (.devrc -c .rc) is false try (-c -out "/hgbin" -cmdbin -r debug STR in "terminal" -rline "gcc -* -*" + -ff -enabledtags -c -o -gcc -o -gpp -o -g++ -o -force -c in STR "commit:" -commitline)
+  
+  

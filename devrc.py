@@ -16,28 +16,59 @@ class DevRCInterpreter:
     def __init__(self):
         self.variables = {}
         self.sections = {}
+        self.section_types = {}
         self.current_section = None
+        self.imported_files = set()
+        self.import_stack = []
         
     def parse_file(self, filepath: str) -> Dict[str, List[str]]:
         """Parse a .devrc file into sections"""
+        # Prevent circular imports
+        abs_path = os.path.abspath(filepath)
+        if abs_path in self.import_stack:
+            print(f"✗ Circular import detected: {filepath}")
+            return {}
+        
+        self.import_stack.append(abs_path)
+        
         with open(filepath, 'r') as f:
             content = f.read()
         
         sections = {}
         current_section = None
+        current_type = None
         
         for line in content.split('\n'):
+            # Remove comments
+            if '#' in line:
+                line = line.split('#')[0]
+            
             line = line.strip()
             if not line:
+                continue
+            
+            # Check for imports
+            if line.startswith('@DEVRC.IMPORT.'):
+                self.handle_import(line, os.path.dirname(filepath))
+                continue
+            
+            # Check for type annotations
+            if line.startswith('@[') and line.endswith(']'):
+                current_type = line[2:-1]
+                print(f"✓ Type annotation found: {current_type}")
                 continue
                 
             # Check for section headers
             if line.startswith('[') and line.endswith(']'):
                 current_section = line[1:-1]
                 sections[current_section] = []
+                if current_type:
+                    self.section_types[current_section] = current_type
+                    current_type = None
             elif current_section:
                 sections[current_section].append(line)
         
+        self.import_stack.pop()
         return sections
     
     def tokenize(self, line: str) -> List[str]:
@@ -95,6 +126,57 @@ class DevRCInterpreter:
             return None
         
         return expr
+    
+    def handle_import(self, line: str, base_path: str):
+        """Handle @DEVRC.IMPORT.[variablename] statements"""
+        # Parse import statement: @DEVRC.IMPORT.[variablename] or @DEVRC.IMPORT.[variablename]="path"
+        match = re.match(r'@DEVRC\.IMPORT\.(\w+)(?:="?([^"]+)"?)?', line)
+        if not match:
+            print(f"✗ Invalid import syntax: {line}")
+            return
+        
+        var_name = match.group(1)
+        import_path = match.group(2)
+        
+        # If no path specified, check if variable exists
+        if not import_path:
+            if var_name not in self.variables:
+                print(f"✗ Import failed: variable '{var_name}' not defined")
+                return
+            import_path = self.variables[var_name]
+        
+        # Resolve relative paths
+        if not os.path.isabs(import_path):
+            import_path = os.path.join(base_path, import_path)
+        
+        # Check if already imported
+        abs_import_path = os.path.abspath(import_path)
+        if abs_import_path in self.imported_files:
+            print(f"✓ Already imported: {import_path}")
+            return
+        
+        # Check if file exists
+        if not os.path.exists(import_path):
+            print(f"✗ Import file not found: {import_path}")
+            return
+        
+        print(f"✓ Importing from: {import_path}")
+        self.imported_files.add(abs_import_path)
+        
+        # Parse and merge the imported file
+        imported_sections = self.parse_file(import_path)
+        for section_name, lines in imported_sections.items():
+            if section_name in self.sections:
+                # Merge with existing section
+                print(f"  ↳ Merging section: [{section_name}]")
+                self.sections[section_name].extend(lines)
+            else:
+                # Add new section
+                print(f"  ↳ Adding section: [{section_name}]")
+                self.sections[section_name] = lines
+                # Copy type if exists
+                if section_name in self.section_types:
+                    self.section_types[section_name] = self.section_types[section_name]
     
     def create_folder(self, path: str):
         """Create a folder if it doesn't exist"""
@@ -247,7 +329,8 @@ class DevRCInterpreter:
             print(f"✗ Section not found: {section_name}")
             return
         
-        print(f"\n=== Executing section: {section_name} ===")
+        section_type = self.section_types.get(section_name, "untyped")
+        print(f"\n=== Executing section: {section_name} @[{section_type}] ===")
         for line in self.sections[section_name]:
             self.process_line(line)
     
@@ -261,6 +344,9 @@ class DevRCInterpreter:
         print(f"DevRC Interpreter - Loading {filepath}")
         self.sections = self.parse_file(filepath)
         
+        print(f"\n✓ Total sections loaded: {len(self.sections)}")
+        print(f"✓ Total imports processed: {len(self.imported_files)}")
+        
         if sections:
             for section in sections:
                 self.execute_section(section)
@@ -268,6 +354,10 @@ class DevRCInterpreter:
             self.execute_all()
         
         print("\n=== Execution complete ===")
+        if self.imported_files:
+            print(f"Imported files:")
+            for imp in self.imported_files:
+                print(f"  - {imp}")
 
 
 def main():
@@ -288,7 +378,9 @@ def main():
         sections = interpreter.parse_file(args.file)
         print("Parsed sections:")
         for name, lines in sections.items():
-            print(f"\n[{name}]")
+            section_type = interpreter.section_types.get(name, "untyped")
+            print(f"\n@[{section_type}]")
+            print(f"[{name}]")
             for line in lines:
                 print(f"  {line}")
     else:
