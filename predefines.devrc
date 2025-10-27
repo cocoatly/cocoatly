@@ -32,6 +32,8 @@ rc_clap="./dependency.devrc"
 @DEVRC.IMPORT.rc_clap
 get="./dependency.devrc"
 @DEVRC.IMPORT.get
+file="./dependency.devrc"
+@DEVRC.IMPORT.file
 
 @[TABLES]
 [TABLE]
@@ -70,3 +72,4 @@ in -pop "./" dirlist "./windowsresourcefiles/compiled/bin/*"
 for (rc_clap) in .devrc is .rc -c in .devrc -to -c .rc -file -cmdbin get file in STR filename, file_ext -runfile in STR "terminal" -to -r debug -cmdline -commitline .rc -to -c -to .devrc in .rc -cmdbin -r debug STR in "terminal" -rline "dotnet *" -rline "list" if (.devrc -c .rc) is false try (-c -out "/hgbin" -cmdbin -r debug STR in "terminal" -rline "gcc -* -*" + -ff -enabledtags -c -o -gcc -o -gpp -o -g++ -o -force -c in STR "commit:" -commitline)
   
   
+
