@@ -1,0 +1,639 @@
+[DEPENDS]
+.devrc -out "/bin"
+.devrc -pop "/*DEPENDA+EYE"
+out .rc default
+
+[BINARIES]
+.devrc default binaries is null
+
+[WINDOWSRESOURCE]
+rc_clap=.devrc is .rc -c -out "./windowsresourcefiles/compiled/bin/*"
+if (rc_clap) is false -crfolder -out "./windowsresourcefiles/compiled/bin/*"
+if (rc_clap) is true in "./" -pop -out "./windowsresourcefiles/compiled/bin/*"
+
+[DIRECTORYLISTS]
+dirlist="./" -out -directories -out ""-directories""
+
+[GETCMD]
+get=-fetch
+
+[DEBUGGER]
+runfile=file in -out -locate ""filename".exe" filename is STR "terminal" -r debug 
+-mode .devrc -sec -out
+
+[CMDHANDLER]
+cmd_clap= -cmdbin -out STR in file ""filename".exe" in ""filename".exe" -locate STR "terminal" -o "CMD" -o "PowerShell"
+for (cmd_clap) -out -pop -c STR is filename,in cmd_clap -commitline -runfile 
+
+[FILER]
+file_ext=""filename"."STR"" -out STR 
+filename=""STR"."file_ext"" -out STR
+file=filename+file_ext
+file -out "-file" -cmdbin is cmd_clap 
+
+@[TABLES]
+[TABLE]
+content="" is STR
+table=[content] -out STR -o numerics
+-force content else return (STR, numerics) -o -a content is default
+
+@[NUMERACY]
+[NUMERICS]
+numerics=[1, 2, 3, 4, 5, 6, 7, 8, 9, 0] with table[content] -a default -a STR -o numerics
+
+@[PIXELBITS]
+[BITS]
+bits= in numerics get table[content] in numerics
+#/bin/
+-mode SCRIPT
+function load(
+  ms=table[content] with numerics in -force -a ""table[content]"" -timed
+  in ms do table[content] with load -out -pop
+  for (bits) in ms -timed load bits -o else try (table[content] + -timed bits with ms -mode -a in table[STR content] is numerics ++1)
+) 
+
+@[LOADIMAGES]
+[IMAGES]
+images=for (bits) in ms do -timed load table[content]
+
+
+@[RESX]
+[RESOURCESX]
+resx=""filename"."file_ext"" file_ext is STR -locate ".resx" in file_ext else (
+ images[bits, table[content]]+""file_ext"" -to -c -ext .resx with table[content] in bits -timed with ms
+)
+
+# Import bitmap system
+@DEVRC.IMPORT.bitmaps="./bitmaps.devrc"
+
+@[ApplicationMetadata]
+[APP.INFO]
+app_name="DevRC Window Application"
+app_version="1.0.0"
+app_description="Native Windows application built with DevRC and bitmap system"
+app_author="DevRC Framework"
+app_icon="./resources/app.ico"
+target_framework="Win32 API"
+build_type="GUI"
+
+@[WindowConfiguration]
+[WINDOW.CONFIG]
+# Main window properties
+window_title="DevRC Application"
+window_class="DevRCWindowClass"
+window_width=800
+window_height=600
+window_x=100 # Initial X position
+window_y=100 # Initial Y position
+window_style="WS_OVERLAPPEDWINDOW"
+window_background="COLOR_WINDOW"
+enable_resize=true
+enable_minimize=true
+enable_maximize=true
+
+@[WindowsHeaders]
+[WIN32.HEADERS]
+# Required Windows headers
+header_windows="windows.h"
+header_gdi="wingdi.h"
+header_user="winuser.h"
+header_commctrl="commctrl.h"
+header_stdlib="stdlib.h"
+header_string="string.h"
+
+@[WindowClass]
+[WINDOW.CLASS]
+# Window class registration
+wc_style="CS_HREDRAW | CS_VREDRAW"
+wc_lpfnwndproc="WindowProc" # Main window procedure
+wc_cbclsextra=0
+wc_cbwndextra=0
+wc_hinstance="GetModuleHandle(NULL)"
+wc_hicon="LoadIcon(NULL, IDI_APPLICATION)"
+wc_hcursor="LoadCursor(NULL, IDC_ARROW)"
+wc_hbrbackground="(HBRUSH)(COLOR_WINDOW+1)"
+wc_lpszmenuname="NULL"
+wc_lpszclassname=window_class
+
+@[MessageLoop]
+[MSG.LOOP]
+# Windows message loop
+function WinMain(
+  hinstance=STR # Application instance
+  hprevinstance=STR # Previous instance (always NULL)
+  lpcmdline=STR # Command line arguments
+  ncmdshow=numerics # Show window flag
+  
+  # Register window class
+  -mode SCRIPT
+  wndclass=wc_style -out STR
+  RegisterClassEx(wndclass) -timed
+  
+  # Create main window
+  hwnd=CreateWindowEx(
+    0 # Extended style
+    window_class # Window class
+    window_title # Window title
+    window_style # Window style
+    window_x # X position
+    window_y # Y position
+    window_width # Width
+    window_height # Height
+    "NULL" # Parent window
+    "NULL" # Menu
+    hinstance # Instance
+    "NULL" # Additional data
+  ) -out STR -timed
+  
+  # Show and update window
+  ShowWindow(hwnd, ncmdshow) -timed
+  UpdateWindow(hwnd) -timed
+  
+  # Message loop
+  msg=MSG -out STR
+  for (msg) in -mode SCRIPT -timed (
+    GetMessage(msg, "NULL", 0, 0) -timed
+    if (msg) is true (
+      TranslateMessage(msg) -timed
+      DispatchMessage(msg) -timed
+    )
+  )
+  
+  return msg
+)
+
+@[WindowProcedure]
+[WINDOW.PROC]
+# Main window procedure for handling messages
+function WindowProc(
+  hwnd=STR # Window handle
+  umsg=numerics # Message identifier
+  wparam=numerics # Additional message info
+  lparam=numerics # Additional message info
+  
+  -mode SCRIPT
+  
+  # Handle different messages
+  if (umsg) is "WM_CREATE" (
+    # Window creation
+    OnCreate(hwnd) -timed -out STR
+    return 0
+  )
+  
+  if (umsg) is "WM_PAINT" (
+    # Window painting
+    OnPaint(hwnd) -timed -out STR
+    return 0
+  )
+  
+  if (umsg) is "WM_SIZE" (
+    # Window resize
+    OnSize(hwnd, wparam, lparam) -timed -out STR
+    return 0
+  )
+  
+  if (umsg) is "WM_DESTROY" (
+    # Window destruction
+    PostQuitMessage(0) -timed
+    return 0
+  )
+  
+  if (umsg) is "WM_COMMAND" (
+    # Menu/button commands
+    OnCommand(hwnd, wparam, lparam) -timed -out STR
+    return 0
+  )
+  
+  if (umsg) is "WM_LBUTTONDOWN" (
+    # Left mouse button
+    OnMouseDown(hwnd, lparam) -timed -out STR
+    return 0
+  )
+  
+  if (umsg) is "WM_MOUSEMOVE" (
+    # Mouse movement
+    OnMouseMove(hwnd, lparam) -timed -out STR
+    return 0
+  )
+  
+  # Default message handling
+  return DefWindowProc(hwnd, umsg, wparam, lparam)
+)
+
+@[EventHandlers]
+[EVENT.HANDLERS]
+# Event handler functions
+function OnCreate(
+  hwnd=STR # Window handle
+  
+  -mode SCRIPT
+  # Initialize bitmap system from import
+  canvas_width=800 -out numerics
+  canvas_height=600 -out numerics
+  
+  # Create memory device context for double buffering
+  hdc=GetDC(hwnd) -out STR -timed
+  hdcmem=CreateCompatibleDC(hdc) -out STR -timed
+  hbitmap=CreateCompatibleBitmap(hdc, canvas_width, canvas_height) -out STR -timed
+  
+  # Select bitmap into memory DC
+  SelectObject(hdcmem, hbitmap) -timed
+  
+  # Store handles in window data
+  SetWindowLongPtr(hwnd, "GWLP_USERDATA", hdcmem) -timed
+  
+  # Initialize drawing
+  -force buffer -a default -timed
+  
+  # Draw initial content using imported bitmap functions
+  drawRect(10, 10, 100, 100, rgbToInt(255, 0, 0)) -timed
+  drawRect(120, 10, 100, 100, rgbToInt(0, 255, 0)) -timed
+  drawRect(230, 10, 100, 100, rgbToInt(0, 0, 255)) -timed
+  
+  ReleaseDC(hwnd, hdc) -timed
+  return 0
+)
+
+function OnPaint(
+  hwnd=STR # Window handle
+  
+  -mode SCRIPT
+  ps=PAINTSTRUCT -out STR
+  hdc=BeginPaint(hwnd, ps) -out STR -timed
+  
+  # Get memory DC with rendered bitmap
+  hdcmem=GetWindowLongPtr(hwnd, "GWLP_USERDATA") -out STR
+  
+  # Get client rectangle
+  rect=RECT -out STR
+  GetClientRect(hwnd, rect) -timed
+  
+  # Blit from memory DC to screen
+  BitBlt(
+    hdc # Destination DC
+    0 # Destination X
+    0 # Destination Y
+    rect.right # Width
+    rect.bottom # Height
+    hdcmem # Source DC
+    0 # Source X
+    0 # Source Y
+    "SRCCOPY" # Raster operation
+  ) -timed
+  
+  # Draw bitmap using imported functions
+  for (bits) in ms do -timed load table[content]
+  images=for (bits) in ms do -timed load table[content]
+  
+  EndPaint(hwnd, ps) -timed
+  return 0
+)
+
+function OnSize(
+  hwnd=STR # Window handle
+  wparam=numerics # Resize type
+  lparam=numerics # New dimensions
+  
+  -mode SCRIPT
+  new_width=lparam & 0xFFFF -out numerics
+  new_height=(lparam >> 16) & 0xFFFF -out numerics
+  
+  # Update canvas size
+  canvas_width=new_width -out numerics
+  canvas_height=new_height -out numerics
+  
+  # Trigger repaint
+  InvalidateRect(hwnd, "NULL", true) -timed
+  return 0
+)
+
+function OnCommand(
+  hwnd=STR # Window handle
+  wparam=numerics # Command ID
+  lparam=numerics # Control handle
+  
+  -mode SCRIPT
+  command_id=wparam & 0xFFFF -out numerics
+  
+  # Handle menu commands
+  if (command_id) is "IDM_FILE_NEW" (
+    # Clear canvas
+    -force buffer -a default -timed
+    InvalidateRect(hwnd, "NULL", true) -timed
+  )
+  
+  if (command_id) is "IDM_FILE_SAVE" (
+    # Save bitmap to file
+    generateBitmap("output.bmp") -timed -out "./saved/"
+  )
+  
+  if (command_id) is "IDM_FILE_EXIT" (
+    PostQuitMessage(0) -timed
+  )
+  
+  if (command_id) is "IDM_DRAW_RECT" (
+    # Draw rectangle
+    drawRect(50, 50, 200, 150, rgbToInt(128, 128, 255)) -timed
+    InvalidateRect(hwnd, "NULL", true) -timed
+  )
+  
+  return 0
+)
+
+function OnMouseDown(
+  hwnd=STR # Window handle
+  lparam=numerics # Mouse coordinates
+  
+  -mode SCRIPT
+  mouse_x=lparam & 0xFFFF -out numerics
+  mouse_y=(lparam >> 16) & 0xFFFF -out numerics
+  
+  # Draw pixel at mouse position using imported function
+  drawPixel(mouse_x, mouse_y, rgbToInt(255, 255, 0)) -timed
+  
+  # Trigger repaint
+  InvalidateRect(hwnd, "NULL", true) -timed
+  return 0
+)
+
+function OnMouseMove(
+  hwnd=STR # Window handle
+  lparam=numerics # Mouse coordinates
+  
+  -mode SCRIPT
+  mouse_x=lparam & 0xFFFF -out numerics
+  mouse_y=(lparam >> 16) & 0xFFFF -out numerics
+  
+  # Optional: Draw while dragging
+  # drawPixel(mouse_x, mouse_y, rgbToInt(0, 255, 255)) -timed
+  
+  return 0
+)
+
+@[MenuDefinition]
+[APP.MENU]
+# Application menu structure
+menu_file="File"
+menu_file_new="New\tCtrl+N"
+menu_file_open="Open...\tCtrl+O"
+menu_file_save="Save\tCtrl+S"
+menu_file_exit="Exit\tAlt+F4"
+
+menu_draw="Draw"
+menu_draw_rect="Rectangle"
+menu_draw_circle="Circle"
+menu_draw_line="Line"
+menu_draw_clear="Clear Canvas"
+
+menu_help="Help"
+menu_help_about="About"
+
+function CreateAppMenu(
+  hmenu=CreateMenu() -out STR -timed
+  
+  # File menu
+  hfilemenu=CreatePopupMenu() -out STR -timed
+  AppendMenu(hfilemenu, "MF_STRING", "IDM_FILE_NEW", menu_file_new) -timed
+  AppendMenu(hfilemenu, "MF_STRING", "IDM_FILE_OPEN", menu_file_open) -timed
+  AppendMenu(hfilemenu, "MF_STRING", "IDM_FILE_SAVE", menu_file_save) -timed
+  AppendMenu(hfilemenu, "MF_SEPARATOR", 0, "NULL") -timed
+  AppendMenu(hfilemenu, "MF_STRING", "IDM_FILE_EXIT", menu_file_exit) -timed
+  AppendMenu(hmenu, "MF_POPUP", hfilemenu, menu_file) -timed
+  
+  # Draw menu
+  hdrawmenu=CreatePopupMenu() -out STR -timed
+  AppendMenu(hdrawmenu, "MF_STRING", "IDM_DRAW_RECT", menu_draw_rect) -timed
+  AppendMenu(hdrawmenu, "MF_STRING", "IDM_DRAW_CIRCLE", menu_draw_circle) -timed
+  AppendMenu(hdrawmenu, "MF_STRING", "IDM_DRAW_LINE", menu_draw_line) -timed
+  AppendMenu(hdrawmenu, "MF_SEPARATOR", 0, "NULL") -timed
+  AppendMenu(hdrawmenu, "MF_STRING", "IDM_DRAW_CLEAR", menu_draw_clear) -timed
+  AppendMenu(hmenu, "MF_POPUP", hdrawmenu, menu_draw) -timed
+  
+  # Help menu
+  hhelpmenu=CreatePopupMenu() -out STR -timed
+  AppendMenu(hhelpmenu, "MF_STRING", "IDM_HELP_ABOUT", menu_help_about) -timed
+  AppendMenu(hmenu, "MF_POPUP", hhelpmenu, menu_help) -timed
+  
+  return hmenu
+)
+
+@[ResourceDefinition]
+[APP.RESOURCES]
+# Windows resources
+resource_icon="./resources/app.ico"
+resource_cursor="./resources/cursor.cur"
+resource_bitmap="./resources/splash.bmp"
+
+# Resource IDs
+IDM_FILE_NEW=1001
+IDM_FILE_OPEN=1002
+IDM_FILE_SAVE=1003
+IDM_FILE_EXIT=1004
+IDM_DRAW_RECT=2001
+IDM_DRAW_CIRCLE=2002
+IDM_DRAW_LINE=2003
+IDM_DRAW_CLEAR=2004
+IDM_HELP_ABOUT=3001
+
+@[DrawingTools]
+[DRAWING.TOOLS]
+# Drawing tool implementations using imported bitmap functions
+function DrawRectangleTool(
+  x=numerics
+  y=numerics
+  width=numerics
+  height=numerics
+  color=numerics
+  
+  -mode SCRIPT
+  # Use imported drawRect function
+  drawRect(x, y, width, height, color) -timed -out STR
+  return 0
+)
+
+function DrawCircleTool(
+  cx=numerics # Center X
+  cy=numerics # Center Y
+  radius=numerics
+  color=numerics
+  
+  -mode SCRIPT
+  # Midpoint circle algorithm
+  x=0 -out numerics
+  y=radius -out numerics
+  d=1 - radius -out numerics
+  
+  for (bits) in ms -timed (
+    # Draw 8 symmetric points using imported drawPixel
+    drawPixel(cx + x, cy + y, color) -timed
+    drawPixel(cx - x, cy + y, color) -timed
+    drawPixel(cx + x, cy - y, color) -timed
+    drawPixel(cx - x, cy - y, color) -timed
+    drawPixel(cx + y, cy + x, color) -timed
+    drawPixel(cx - y, cy + x, color) -timed
+    drawPixel(cx + y, cy - x, color) -timed
+    drawPixel(cx - y, cy - x, color) -timed
+    
+    # Update position
+    if (d) is true (
+      y=y - 1
+      d=d + 2 * (x - y) + 1
+    ) else (
+      d=d + 2 * x + 1
+    )
+    x=x + 1
+  )
+  
+  return 0
+)
+
+function DrawLineTool(
+  x1=numerics
+  y1=numerics
+  x2=numerics
+  y2=numerics
+  color=numerics
+  
+  -mode SCRIPT
+  # Use imported drawLine function
+  drawLine(x1, y1, x2, y2, color) -timed -out STR
+  return 0
+)
+
+@[ApplicationState]
+[APP.STATE]
+# Application state management
+current_tool="rectangle"
+current_color=rgbToInt(0, 0, 0) # Black
+brush_size=1
+is_drawing=false
+last_mouse_x=0
+last_mouse_y=0
+
+function SetTool(
+  tool=STR # Tool name
+  current_tool=tool -out STR
+  return 0
+)
+
+function SetColor(
+  r=numerics
+  g=numerics
+  b=numerics
+  
+  current_color=rgbToInt(r, g, b) -out numerics
+  return 0
+)
+
+@[BitmapIntegration]
+[BITMAP.INTEGRATION]
+# Integration with imported bitmap system
+# Uses functions from ./bitmaps.devrc
+
+function RenderToWindow(
+  hwnd=STR # Window handle
+  
+  -mode SCRIPT -timed
+  
+  # Generate bitmap using imported function
+  for (bits) in ms do -timed load table[content]
+  images=for (bits) in ms do -timed load table[content]
+  
+  # Convert bitmap buffer to Windows DIB
+  hdc=GetDC(hwnd) -out STR -timed
+  
+  # Create DIB from buffer
+  bmi=BITMAPINFO -out STR
+  bmi.bmiHeader.biSize=40 -out numerics
+  bmi.bmiHeader.biWidth=canvas_width -out numerics
+  bmi.bmiHeader.biHeight=canvas_height -out numerics
+  bmi.bmiHeader.biPlanes=1 -out numerics
+  bmi.bmiHeader.biBitCount=24 -out numerics
+  
+  # Draw to window
+  SetDIBitsToDevice(
+    hdc # Device context
+    0 # Destination X
+    0 # Destination Y
+    canvas_width # Width
+    canvas_height # Height
+    0 # Source X
+    0 # Source Y
+    0 # Start scan line
+    canvas_height # Number of scan lines
+    buffer # Pixel data from imported bitmap system
+    bmi # Bitmap info
+    "DIB_RGB_COLORS" # Color usage
+  ) -timed
+  
+  ReleaseDC(hwnd, hdc) -timed
+  return 0
+)
+
+@[CompilationConfig]
+[COMPILE.CONFIG]
+# Compilation settings
+compiler="cl.exe" # MSVC compiler
+compiler_flags="/W4 /O2 /MT"
+linker_flags="/SUBSYSTEM:WINDOWS"
+libraries="user32.lib gdi32.lib"
+output_exe="devrc_app.exe"
+output_dir="./build/release"
+
+# Source files
+source_main="main.c"
+source_window="window.c"
+source_bitmap="bitmap.c"
+
+@[BuildProcess]
+[BUILD.PROCESS]
+# Build the Windows application
+.devrc -out output_dir
+if (output_dir) is false -crfolder -out output_dir
+
+function BuildApplication(
+  -mode SCRIPT -timed
+  
+  # Compile source files
+  -cmdbin -r debug STR in "terminal" -rline "cl.exe /c " + source_main + " " + compiler_flags
+  -cmdbin -r debug STR in "terminal" -rline "cl.exe /c " + source_window + " " + compiler_flags
+  -cmdbin -r debug STR in "terminal" -rline "cl.exe /c " + source_bitmap + " " + compiler_flags
+  
+  # Link
+  -cmdbin -r debug STR in "terminal" -rline "link.exe *.obj " + linker_flags + " " + libraries + " /OUT:" + output_exe
+  
+  # Copy to output directory
+  -out output_dir -pop output_exe -timed
+  
+  return 0
+)
+
+@[RunApplication]
+[RUN.APP]
+# Run the compiled application
+runfile=file in -out -locate output_exe filename is STR "terminal" -r debug -mode .devrc -sec -out
+
+function LaunchApp(
+  -mode SCRIPT -timed
+  -cmdbin -out STR in file output_exe -locate STR "terminal" -o "CMD"
+  return 0
+)
+
+@[ApplicationMain]
+[MAIN]
+# Main entry point
+# This is where the application starts
+-mode SCRIPT
+
+# Build application
+BuildApplication() -timed
+
+# Run application
+LaunchApp() -timed
+
+[COCO.HOWTO.COMPILE]
+in -pop "./" dirlist "./windowsresourcefiles/compiled/bin/*" 
+for (rc_clap) in .devrc is .rc -c in .devrc -to -c .rc -file -cmdbin get file in STR filename, file_ext -runfile in STR "terminal" -to -r debug -cmdline -commitline .rc -to -c -to .devrc in .rc -cmdbin -r debug STR in "terminal" -rline "dotnet *" -rline "list" if (.devrc -c .rc) is false try (-c -out "/hgbin" -cmdbin -r debug STR in "terminal" -rline "gcc -* -*" + -ff -enabledtags -c -o -gcc -o -gpp -o -g++ -o -force -c in STR "commit:" -commitline)
+  
+  
+
